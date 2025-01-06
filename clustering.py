@@ -14,7 +14,7 @@ rc4 = data[4]['reaction_center']
 
 #node match function
 def node_match(n1, n2):
-    return n1['element'] == n2['element']
+    return n1['charge'] == n2['charge'] and n1['element'] == n2['element']
 
 def edge_match(e1, e2):
     return e1['order'] == e2['order']
