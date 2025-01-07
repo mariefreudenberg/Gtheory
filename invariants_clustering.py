@@ -8,24 +8,27 @@ with open('reaction_centers.pkl', 'rb') as f:
 
 # Funktion zur Berechnung der Invarianten
 def calculate_invariants(graph):
-    vertex_count = graph.number_of_nodes()  # Anzahl der Knoten
-    edge_count = graph.number_of_edges()  # Anzahl der Kanten
+    #vertex_count = graph.number_of_nodes()  # Anzahl der Knoten
+    #edge_count = graph.number_of_edges()  # Anzahl der Kanten
     degrees = sorted(dict(graph.degree()).values())  # Knotengrade (sortiert)
     density = nx.density(graph)
-    node_connectivity = nx.node_connectivity(graph)
-    triangles = sum(nx.triangles(graph).values())  # Gesamtanzahl der Dreiecke
-    centrality = nx.degree_centrality(graph)  # Dictionary mit Zentralitäten
+    #planarity = nx.is_planar(graph) #only one group: all planar
+    #node_connectivity = nx.node_connectivity(graph)
+    #triangles = sum(nx.triangles(graph).values())  # Gesamtanzahl der Dreiecke
+    #centrality = nx.degree_centrality(graph)  # Dictionary mit Zentralitäten: 19427 groups is way too much
     avg_shortest_path = (
         nx.average_shortest_path_length(graph)
         if nx.is_connected(graph) else None
     )  # Nur berechnen, wenn der Graph zusammenhängend ist
     return (
-        vertex_count,
-        edge_count,
+        #vertex_count,
+        #edge_count,
         degrees,
         density,
-        node_connectivity,
-        triangles,
+        #planarity,
+        #node_connectivity,
+        #triangles,
+        #centrality,
         avg_shortest_path,
     )
 
@@ -54,18 +57,19 @@ def cluster_by_invariants(data):
     return clusters, invariants_per_group
 
 
-# Funktion zur Analyse der Unterteilungen durch jede Invariante
 def analyze_invariants_divisions(data):
     unique_values_per_invariant = {}
 
-    # Berechne alle Invarianten für jedes RC
+    # Calculate all invariants for each RC
     all_invariants = [calculate_invariants(rc['reaction_center']) for rc in data]
 
-    # Für jede Position der Invariante (z. B. Vertex Count, Edge Count)
+    # For each invariant position (e.g., Vertex Count, Edge Count)
     for i in range(len(all_invariants[0])):
-        # Umwandlung in hashbare Objekte, z. B. Tupel
+        # Convert mutable objects (like dicts) to hashable objects
         unique_values = set(
-            tuple(invariant[i]) if isinstance(invariant[i], list) else invariant[i]
+            tuple(invariant[i].items()) if isinstance(invariant[i], dict) else
+            tuple(invariant[i]) if isinstance(invariant[i], list) else
+            invariant[i]
             for invariant in all_invariants
         )
         unique_values_per_invariant[i] = len(unique_values)
@@ -73,11 +77,12 @@ def analyze_invariants_divisions(data):
     return unique_values_per_invariant
 
 
-# Gruppierung der RCs nach Invarianten
+# Group RCs by invariants
 clusters, invariants_per_group = cluster_by_invariants(data)
 
-# Anzahl der Unterteilungen pro Invariante
+# Analyze divisions created by each invariant
 invariant_divisions = analyze_invariants_divisions(data)
+
 
 # Ergebnisse ausgeben
 print(f"Anzahl der Gruppen basierend auf Invarianten: {len(clusters)}")
