@@ -11,23 +11,26 @@ from synutility.SynIO.data_type import load_from_pickle
 data = load_from_pickle('/u/home/gpraktikum/Documents/files/ITS_graphs.pkl')
 
 # Extracting reaction center and plotting using SynUtils
-from src.rc_extract import get_rc
-reaction_center = get_rc(data[1]['ITS'])
+G = data[0]['ITS']
+reaction_center = nx.edge_subgraph(G,\
+                                   [(e[0],e[1]) for e in G.edges(data=True) \
+                                    if e[2]['standard_order']!=0])
 
 from synutility.SynVis.graph_visualizer import GraphVisualizer
 import matplotlib.pyplot as plt
 
 #Extract RC from all graphs and save them in an extra file
-import pickle
-from src.rc_extract import get_rc
 
-# List to store reaction centers
+def compute_reaction_center(graph):
+    # Filter edges with 'standard_order' != 0 and create the subgraph
+    subgraph = nx.edge_subgraph(graph, [(e[0], e[1]) for e in graph.edges(data=True) if e[2]['standard_order'] != 0])
+    return nx.Graph(subgraph)  # Convert to a standalone Graph
+
+# Compute reaction centers for the entire dataset
 reaction_centers = []
-
-# Extract RC for each graph in the dataset
 for item in data:
     graph = item['ITS']
-    rc = get_rc(graph)
+    rc = compute_reaction_center(graph)
     reaction_centers.append({'R-id': item['R-id'], 'reaction_center': rc})
 
 # Save the reaction centers to a file
@@ -36,13 +39,14 @@ with open('reaction_centers.pkl', 'wb') as f:
 
 print("Reaction centers saved to reaction_centers.pkl")
 
+
 fig, ax = plt.subplots(2, 1, figsize=(15, 10))
 vis = GraphVisualizer()
 vis.plot_its(data[1]['ITS'], ax[0], use_edge_color=True)
 vis.plot_its(reaction_center, ax[1], use_edge_color=True)
 plt.show()
 
-
+"""
 graph1 = data[0]['ITS']
 graph2 = data[1]['ITS']
 
@@ -50,3 +54,4 @@ are_isomorphic = nx.is_isomorphic(graph1, graph2)
 
 # Print the result
 print("Are the graphs isomorphic?", are_isomorphic)
+"""

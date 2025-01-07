@@ -77,6 +77,17 @@ def process_and_save(data, output_file):
     print(f"Updated data saved to {output_file}")
     return data_with_groups
 
+# Measuring the time it takes to run the algorithm
+import time
+starttime = time.time()
+
 output_file = 'rc_with_clusters.pkl'
 data_with_groups = process_and_save(data, output_file)
+
+endtime = time.time()
+
+difftime = endtime - starttime
+print(difftime)   #21.39 seconds to run the algorithm
+
+
 
