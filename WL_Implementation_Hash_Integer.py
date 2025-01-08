@@ -1,7 +1,7 @@
 import networkx as nx
 import pickle
 from collections import Counter, defaultdict
-
+import time
 
 # Function to initialize node labels WITH edge labels
 def initialize_labels(graph):
@@ -109,7 +109,32 @@ def recursive_wl_clustering(data):
         num_clusters = num_new_clusters
         clusters = new_clusters
 
-    return clusters
+    return list(clusters.values())
+
+def node_match(n1, n2):
+    return n1['charge'] == n2['charge'] and n1['element'] == n2['element']
+
+def edge_match(e1, e2):
+    return e1['order'] == e2['order']
+
+# Function to post-cluster by isomorphism
+def postcluster_by_isomorphism(data, invariant_clusters):
+    final_clusters = []
+    for group in invariant_clusters:
+        sub_clusters = []
+        for idx in group:
+            rc = data[idx]['reaction_center']
+            is_added = False
+            for sub_cluster in sub_clusters:
+                representative_rc = data[sub_cluster[0]]['reaction_center']
+                if nx.is_isomorphic(rc, representative_rc, node_match=node_match, edge_match=edge_match):
+                    sub_cluster.append(idx)
+                    is_added = True
+                    break
+            if not is_added:
+                sub_clusters.append([idx])
+        final_clusters.extend(sub_clusters)
+    return final_clusters
 
 
 # Main function
@@ -117,9 +142,22 @@ if __name__ == "__main__":
     # Load data
     with open('reaction_centers.pkl', 'rb') as f:
         data = pickle.load(f)
-
+    wl_start = time.time()
     # Perform recursive WL clustering
     final_clusters = recursive_wl_clustering(data)
+    wl_end = time.time()
+    wl_time = wl_end - wl_start
+    print(f"Time for WL-Implementation: {wl_time:.2f}s")
+
+    iso_start = time.time()
+    post_iso_clusters = postcluster_by_isomorphism(data,final_clusters)
+    iso_end = time.time()
+
+    iso_time = iso_end - iso_start
+    print(f"Time for Post Clustering Isomorphism Test: {iso_time:.2f}s")
 
     # Output final results
-    print(f"Final number of clusters: {len(final_clusters)}")
+    print(f"Final number of clusters after WL Test: {len(final_clusters)}")
+    print(f"Final number of clusters after classy Isomorphism Test: {len(post_iso_clusters)}")
+
+    print(f"Time in total: {wl_time + iso_time:.2f}s")
