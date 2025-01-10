@@ -4,7 +4,7 @@ import time
 from collections import Counter
 
 # Load data
-with open('reaction_centers.pkl', 'rb') as f:
+with open('Small_RCs_khop_2.pkl', 'rb') as f:
     data = pickle.load(f)
 
 
@@ -65,6 +65,26 @@ def postcluster_by_isomorphism(data, element_clusters):
 
     return final_clusters
 
+import matplotlib.pyplot as plt
+
+# Function to plot cluster size distribution
+def plot_cluster_distribution(clusters):
+    # Calculate the size of each cluster
+    cluster_sizes = [len(cluster) for cluster in clusters]
+
+    # Create a histogram of cluster sizes
+    plt.figure(figsize=(10, 6))
+    plt.hist(cluster_sizes, bins=range(1, max(cluster_sizes) + 2), edgecolor='black', align='left')
+    plt.xlabel("Cluster Size")
+    plt.ylabel("Number of Clusters")
+    plt.title("Distribution of Cluster Sizes")
+    plt.xticks(range(1, max(cluster_sizes) + 1))
+    plt.show()
+
+    # Print summary statistics
+    print(f"Total Clusters: {len(clusters)}")
+    print(f"Clusters with single molecule graphs: {cluster_sizes.count(1)}")
+    print(f"Largest Cluster Size: {max(cluster_sizes)}")
 
 # Main function to combine both clustering methods and measure time
 def main():
@@ -73,6 +93,8 @@ def main():
     element_clusters = cluster_by_element_counts(data)
     print(len(element_clusters))
     end_element_clustering = time.time()
+
+    plot_cluster_distribution(element_clusters)
 
     # Step 2: Post-cluster by isomorphism
     start_isomorphism_clustering = time.time()

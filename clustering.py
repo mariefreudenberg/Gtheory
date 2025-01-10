@@ -1,16 +1,9 @@
 import pickle
 import networkx as nx
 
-with open('reaction_centers.pkl', 'rb') as f:
+with open('Small_RCs_khop_2.pkl', 'rb') as f:
     data = pickle.load(f)
 
-#print(data)
-
-rc0 = data[0]['reaction_center']
-rc1 = data[1]['reaction_center']
-rc2 = data[2]['reaction_center']
-rc3 = data[3]['reaction_center']
-rc4 = data[4]['reaction_center']
 
 #node match function
 def node_match(n1, n2):
@@ -43,10 +36,12 @@ def cluster_reaction_centers(data):
 
     return clusters
 
+# Measuring the time it takes to run the algorithm
+import time
+starttime = time.time()
+
 cluster = cluster_reaction_centers(data)
-# Print results
-for i, group in enumerate(cluster):
-    print(f"Group {i + 1}: {group}")
+print(len(cluster))
 
 # Add group number to the data
 def add_group_numbers(data, clusters):
@@ -71,15 +66,13 @@ def process_and_save(data, output_file):
     data_with_groups = add_group_numbers(data, clusters)
 
     # Step 3: Save the updated data to a pickle file
-    with open(output_file, 'wb') as f:
-        pickle.dump(data_with_groups, f)
+    #with open(output_file, 'wb') as f:
+    #    pickle.dump(data_with_groups, f)
 
-    print(f"Updated data saved to {output_file}")
+    #print(f"Updated data saved to {output_file}")
     return data_with_groups
 
-# Measuring the time it takes to run the algorithm
-import time
-starttime = time.time()
+
 
 output_file = 'rc_with_clusters.pkl'
 data_with_groups = process_and_save(data, output_file)

@@ -3,15 +3,11 @@ import networkx as nx
 
 from Documents.files.src.rc_extract import get_rc
 
-with open('/u/home/gpraktikum/Documents/files/ITS_graphs.pkl', 'rb') as f:
+with open('ITS_largerdataset.pkl', 'rb') as f:
     data = pickle.load(f)
 
-# Using SynUtils
-from synutility.SynIO.data_type import load_from_pickle
-data = load_from_pickle('/u/home/gpraktikum/Documents/files/ITS_graphs.pkl')
-
 # Extracting reaction center and plotting using SynUtils
-G = data[0]['ITS']
+G = data[1]['ITS']
 reaction_center = nx.edge_subgraph(G,\
                                    [(e[0],e[1]) for e in G.edges(data=True) \
                                     if e[2]['standard_order']!=0])
@@ -31,10 +27,10 @@ reaction_centers = []
 for item in data:
     graph = item['ITS']
     rc = compute_reaction_center(graph)
-    reaction_centers.append({'R-id': item['R-id'], 'reaction_center': rc})
+    reaction_centers.append({'R_ID': item['R_ID'], 'reaction_center': rc}) #R-id for small, R_ID for large dataset
 
 # Save the reaction centers to a file
-with open('reaction_centers.pkl', 'wb') as f:
+with open('Larger_rcs.pkl', 'wb') as f:
     pickle.dump(reaction_centers, f)
 
 print("Reaction centers saved to reaction_centers.pkl")

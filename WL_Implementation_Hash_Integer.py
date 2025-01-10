@@ -137,10 +137,40 @@ def postcluster_by_isomorphism(data, invariant_clusters):
     return final_clusters
 
 
+import matplotlib.pyplot as plt
+
+
+# Function to plot cluster size distribution
+def plot_cluster_distribution(clusters):
+    # Calculate the size of each cluster
+    cluster_sizes = [len(cluster) for cluster in clusters]
+
+    # Count the frequency of each cluster size
+    size_counts = Counter(cluster_sizes)
+
+    # Sort the sizes and their counts
+    sizes = sorted(size_counts.keys())
+    counts = [size_counts[size] for size in sizes]
+
+    # Create a bar plot for the cluster size distribution
+    plt.figure(figsize=(10, 6))
+    plt.bar(sizes, counts, width=0.8, edgecolor='black', align='center')
+    plt.xlabel("Cluster Size")
+    plt.ylabel("Number of Clusters")
+    plt.title("Distribution of Cluster Sizes")
+    plt.xticks(sizes)  # Only include sizes that are present
+    plt.show()
+
+    # Print summary statistics
+    print(f"Total Clusters: {len(clusters)}")
+    print(f"Clusters with single molecule graphs: {size_counts.get(1, 0)}")
+    print(f"Largest Cluster Size: {max(cluster_sizes)}")
+
+
 # Main function
 if __name__ == "__main__":
     # Load data
-    with open('reaction_centers.pkl', 'rb') as f:
+    with open('Small_RCs_khop_2.pkl', 'rb') as f:
         data = pickle.load(f)
     wl_start = time.time()
     # Perform recursive WL clustering
@@ -161,3 +191,5 @@ if __name__ == "__main__":
     print(f"Final number of clusters after classy Isomorphism Test: {len(post_iso_clusters)}")
 
     print(f"Time in total: {wl_time + iso_time:.2f}s")
+
+    plot_cluster_distribution(final_clusters)
