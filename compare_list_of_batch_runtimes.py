@@ -38,11 +38,17 @@ import matplotlib.pyplot as plt
 labels = ['Element String', 'NetworkX WL (3 it)', 'Own WL']
 
 # Create a boxplot
-plt.figure(figsize=(10, 6))
-plt.boxplot(data, labels=labels, patch_artist=True, showmeans=True)
+fig, ax = plt.subplots(figsize=(10, 6))
+boxplot = ax.boxplot(data, labels=labels, patch_artist=True, showmeans=True)
+# Custom purple pastel colors
+colors = ['#DDA0DD', '#DDA0DD', '#DDA0DD']
+
+# Apply the colors to the boxplot
+for patch, color in zip(boxplot['boxes'], colors):
+    patch.set_facecolor(color)
 
 # Customize the plot
-plt.title('Runtime Distributions by Group (khop_0)')
+plt.title('Runtime Distributions by Group (khop_0) for smaller dataset')
 plt.ylabel('Runtime (seconds)')
 plt.grid(axis='y', linestyle='--', alpha=0.7)
 
